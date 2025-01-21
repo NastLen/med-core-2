@@ -1,0 +1,100 @@
+{% extends "base.html" %} {% block title %}Dashboard{% endblock %} {% block head
+%} {% endblock %} {% block content %}
+<h2>Dashboard</h2>
+<div class="dashboard-grid">
+  <div class="appointments">
+    <h3>Appointments</h3>
+    <ul style="list-style-type: none">
+      {% for appointment in appointments %}
+      <li>
+        <strong>Time:</strong> {{ appointment.time }} <br />
+        <strong>Patient:</strong>
+        <a
+          href="#"
+          class="patient-link"
+          data-patient-id="{{ appointment.patient_id }}"
+          >{{ appointment.patient_name }}</a
+        >
+        <br />
+        {% if appointment.arrived %}
+        <span style="color: green">Patient has arrived</span>
+        {% else %}
+        <form
+          method="POST"
+          action="{{ url_for('mark_arrived', appointment_id=appointment.id) }}"
+        >
+          <button type="submit" style="background-color: green; color: white">
+            Mark as Arrived
+          </button>
+        </form>
+        {% endif %}
+      </li>
+      <hr />
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="patient-details">
+    <h3>Patient Details</h3>
+    <div id="patient-details-content">
+      <p>Select a patient to view details.</p>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  // Ensure the script is loaded correctly
+  console.log("Script Loaded");
+
+  // Function to show patient details
+  function showPatientDetails(patientId) {
+    console.log(`Loading patient details for ID ${patientId}`);
+    const patientDetailsContent = document.getElementById(
+      "patient-details-content"
+    );
+    console.log("Patient details content element:", patientDetailsContent);
+    if (patientDetailsContent) {
+      // Fetch patient data from the server (this is a placeholder, replace with actual data fetching logic)
+      const patientData = {
+        ausweissNumber: "123456789",
+        photo: "path/to/photo.jpg",
+        phone: "(123) 456-7890",
+        address: "123 Main St, Anytown, USA",
+      };
+
+      patientDetailsContent.innerHTML = `
+        <h1>Patient Details</h1>
+        <div style="display: flex;">
+          <div style="width: 50%; padding-right: 20px;">
+            <h2>Ausweiss Number</h2>
+            <p>${patientData.ausweissNumber}</p>
+            <h2>Phone</h2>
+            <p>${patientData.phone}</p>
+            <h2>Address</h2>
+            <p>${patientData.address}</p>
+          </div>
+          <div style="width: 50%;">
+            <h2>Photo</h2>
+            <img src="${patientData.photo}" alt="Patient Photo" style="width: 100%;">
+          </div>
+        </div>
+      `;
+    } else {
+      console.error("Patient details content element not found");
+    }
+  }
+
+  // Add event listeners to patient links
+  document.addEventListener("DOMContentLoaded", function () {
+    const patientLinks = document.querySelectorAll(".patient-link");
+    console.log("Patient links:", patientLinks);
+    patientLinks.forEach((link) => {
+      link.addEventListener("click", function (event) {
+        event.preventDefault();
+        const patientId = this.getAttribute("data-patient-id");
+        console.log(`Patient link clicked: ${patientId}`);
+        showPatientDetails(patientId);
+      });
+    });
+  });
+</script>
+{% endblock %}

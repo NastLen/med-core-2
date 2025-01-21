@@ -1,0 +1,123 @@
+{% extends "base.html" %} {% block title %}Dashboard{% endblock %} {% block head
+%}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='dashboard.css') }}"
+/>
+{% endblock %} {% block content %}
+<h2>Dashboard</h2>
+<div class="dashboard-grid">
+  <div class="appointments">
+    <h3>Appointments</h3>
+    <ul style="list-style-type: none">
+      {% for appointment in appointments %}
+      <li>
+        <strong>Time:</strong> {{ appointment.time }} <br />
+        <strong>Patient:</strong>
+        <a
+          href="#"
+          class="patient-link"
+          data-patient-name="{{ appointment.patient_name }}"
+          >{{ appointment.patient_name }}</a
+        >
+        <br />
+        {% if appointment.arrived %}
+        <span style="color: green">Patient has arrived</span>
+        {% else %}
+        <form
+          method="POST"
+          action="{{ url_for('mark_arrived', appointment_id=appointment.id) }}"
+        >
+          <button type="submit" style="background-color: green; color: white">
+            Mark as Arrived
+          </button>
+        </form>
+        {% endif %}
+      </li>
+      <hr />
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="anamnesis">
+    <h3>Anamnesis Details</h3>
+    <div id="anamnesis-content">
+      <p>Select a patient to view details.</p>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  // Ensure the script is loaded correctly
+  console.log("Script Loaded");
+
+  // Function to show anamnesis details
+  function showAnamnesis(patientName) {
+    console.log(`Loading anamnesis details for ${patientName}`);
+    const anamnesisContent = document.getElementById("anamnesis-content");
+    console.log("Anamnesis content element:", anamnesisContent);
+    if (anamnesisContent) {
+      anamnesisContent.innerHTML = `
+          <h1>Patient Record for ${patientName}</h1>
+          <div style="display: flex;">
+            <div style="width: 50%; padding-right: 20px;">
+              <h2>Patient Past History</h2>
+              <textarea id="past-history" name="past_history" rows="6" cols="50" placeholder="Enter patient's past history here..."></textarea>
+              <h2>Anamnesis</h2>
+              <textarea id="anamnesis" name="anamnesis" rows="6" cols="50" placeholder="Enter anamnesis details here..."></textarea>
+            </div>
+            <div style="width: 50%;">
+              <h2>Patient's Previous Consultations</h2>
+              <div>
+                <button onclick="showTab('tab1')">Tab 1</button>
+                <button onclick="showTab('tab2')">Tab 2</button>
+                <button onclick="showTab('tab3')">Tab 3</button>
+              </div>
+              <div id="tab-content" style="border: 1px solid #000; padding: 10px; margin-top: 10px; height: 200px; overflow-y: auto;">
+                <div id="tab1" class="tab" style="display: none;">
+                  <p>Previous consultation details for ${patientName} - Tab 1...</p>
+                </div>
+                <div id="tab2" class="tab" style="display: none;">
+                  <p>Previous consultation details for ${patientName} - Tab 2...</p>
+                </div>
+                <div id="tab3" class="tab" style="display: none;">
+                  <p>Previous consultation details for ${patientName} - Tab 3...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h2>Contact Information</h2>
+            <p>For any inquiries, please contact us at:</p>
+            <p>Email: contact@example.com</p>
+            <p>Phone: (123) 456-7890</p>
+          </div>
+        `;
+      showTab("tab1"); // Default to showing Tab 1
+    } else {
+      console.error("Anamnesis content element not found");
+    }
+  }
+
+  // Function to show a specific tab
+  function showTab(tabId) {
+    console.log(`Showing tab ${tabId}`);
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.style.display = "none";
+    });
+    document.getElementById(tabId).style.display = "block";
+  }
+
+  // Add event listeners to patient links
+  document.addEventListener("DOMContentLoaded", function () {
+    const patientLinks = document.querySelectorAll(".patient-link");
+    console.log("Patient links:", patientLinks);
+    patientLinks.forEach((link) => {
+      link.addEventListener("click", function () {
+        const patientName = this.getAttribute("data-patient-name");
+        console.log(`Patient link clicked: ${patientName}`);
+        showAnamnesis(patientName);
+      });
+    });
+  });
+</script>
+{% endblock %}

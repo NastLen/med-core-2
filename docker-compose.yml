@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:10.5
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: medcore_db
+      MYSQL_USER: medcore
+      MYSQL_PASSWORD: medcorepassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db_data:/var/lib/mysql  # Ensure the data is stored in db_data directory inside your project
+
+  flask:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      FLASK_ENV: development
+      MYSQL_HOST: mariadb
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: medcore_db
+      MYSQL_USER: medcore
+      MYSQL_PASSWORD: medcorepassword
+    depends_on:
+      - mariadb
+
+volumes:
+  mariadb_data:

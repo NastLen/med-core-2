@@ -1,0 +1,155 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+<link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
+
+<!-- Hero  -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>EHR Information System in Health Care</h1>
+    <p>
+      Revolutionizing healthcare with our state-of-the-art Electronic Health
+      Record system.
+    </p>
+    <a href="{{ url_for('auth.register') }}" class="btn btn-primary"
+      >Get Started</a
+    >
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features">
+  <h2>Features</h2>
+  <div class="feature-list">
+    <div class="feature-item">
+      <i class="fas fa-user-md"></i>
+      <h3>Patient Management</h3>
+      <p>Efficiently manage patient records and appointments.</p>
+    </div>
+    <div class="feature-item">
+      <i class="fas fa-file-medical"></i>
+      <h3>Medical Records</h3>
+      <p>Access and update patient medical records with ease.</p>
+    </div>
+    <div class="feature-item">
+      <i class="fas fa-chart-line"></i>
+      <h3>Analytics</h3>
+      <p>Gain insights with powerful analytics and reporting tools.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials">
+  <h2>What Our Customers Say</h2>
+  <div class="testimonial-list">
+    <div class="testimonial-item">
+      <p>
+        "This EHR system has transformed our practice. It's user-friendly and
+        efficient."
+      </p>
+      <h4>Dr. Vito Corleone</h4>
+    </div>
+    <div class="testimonial-item">
+      <p>"A game-changer for our clinic. The support team is fantastic!"</p>
+      <h4>Dr. Jane Smith</h4>
+    </div>
+  </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="benefits">
+  <h2>Benefits</h2>
+  <ul>
+    <li>Improve patient care and safety</li>
+    <li>Streamline administrative processes</li>
+    <li>Enhance data security and compliance</li>
+    <li>Boost practice efficiency and profitability</li>
+  </ul>
+</section>
+
+<!-- Contact Section -->
+<section class="contact">
+  <h2>Contact Us</h2>
+  <p>For more information or to schedule a demo, please contact us at:</p>
+  <p>Email: stacy_lucas_melise@gmail.com</p>
+  <p>Phone: (0) +49 160 3769283</p>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Intersection Observer for Feature Items
+    const featureItems = document.querySelectorAll(".feature-item");
+
+    const observerOptions = {
+      threshold: 0.1,
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    featureItems.forEach((item) => {
+      observer.observe(item);
+    });
+  });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Testimonials Carousel
+    const testimonials = document.querySelectorAll(".testimonial-item");
+    let currentIndex = 0;
+
+    function showTestimonial(index) {
+      testimonials.forEach((testimonial, i) => {
+        testimonial.classList.remove("active", "next", "prev");
+        if (i === index) {
+          testimonial.classList.add("active");
+        } else if (i === (index + 1) % testimonials.length) {
+          testimonial.classList.add("next");
+        } else if (
+          i ===
+          (index - 1 + testimonials.length) % testimonials.length
+        ) {
+          testimonial.classList.add("prev");
+        }
+      });
+    }
+
+    function showNextTestimonial() {
+      currentIndex = (currentIndex + 1) % testimonials.length;
+      showTestimonial(currentIndex);
+    }
+
+    // Auto-slide functionality
+    setInterval(showNextTestimonial, 5000); // Change testimonial every 5 seconds
+
+    // Initial display
+    showTestimonial(currentIndex);
+
+    // Intersection Observer for Hero Heading and Feature Items
+    const heroHeading = document.querySelector(".hero-heading");
+    const featureItems = document.querySelectorAll(".feature-item");
+
+    const observerOptions = {
+      threshold: 0.1,
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    observer.observe(heroHeading);
+    featureItems.forEach((item) => {
+      observer.observe(item);
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %} {% block title %}About Us {% endblock %} {% block
+content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}" />
+
+<section class="about-us">
+  <h1>About Us</h1>
+  <p>
+    Welcome to our EHR Information System in Health Care. Our mission is to
+    revolutionize healthcare management by providing a state-of-the-art
+    Electronic Health Record system that enhances patient care, streamlines
+    administrative processes, and boosts practice efficiency.
+  </p>
+</section>
+
+<section class="team">
+  <h2>Meet the Team</h2>
+  <div class="team-members">
+    <div class="team-member">
+      <img
+        src="{{ url_for('static', filename='images/anastasia.jpg') }}"
+        alt="Anastasia"
+      />
+      <h3>Anastasia</h3>
+      <p>Co-founder and CEO</p>
+    </div>
+    <div class="team-member">
+      <img
+        src="{{ url_for('static', filename='images/lucas.jpg') }}"
+        alt="Lucas"
+      />
+      <h3>Lucas</h3>
+      <p>Co-founder and CTO</p>
+    </div>
+    <div class="team-member">
+      <img
+        src="{{ url_for('static', filename='images/melise.jpg') }}"
+        alt="Melise"
+      />
+      <h3>Melise</h3>
+      <p>Co-founder and COO</p>
+    </div>
+  </div>
+</section>
+
+<section class="mission">
+  <h2>Our Mission</h2>
+  <p>
+    Our mission is to provide innovative healthcare solutions that empower
+    healthcare professionals to deliver the highest quality of care to their
+    patients.
+  </p>
+</section>
+
+<section class="contact">
+  <h2>Contact Us</h2>
+  <p>For more information or to schedule a demo, please contact us at:</p>
+  <p>Email: info@ehrsystem.com</p>
+  <p>Phone: (123) 456-7890</p>
+</section>
+{% endblock %}
