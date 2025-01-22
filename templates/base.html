@@ -14,7 +14,8 @@
   <script src="{{ url_for('static', filename='scripts/core-functions/login.js') }}"></script>
   <script src="{{ url_for('static', filename='scripts/core-functions/scripts.js') }}"></script>
   <script src="{{ url_for('static', filename='scripts/core-functions/2fa.js') }}"></script>
-
+  <script src="{{ url_for('static', filename='scripts/core-functions/forgot-password.js') }}"></script>
+  <script src="{{ url_for('static', filename='scripts/core-functions/reset-password.js') }}"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
         const token = localStorage.getItem('token');
@@ -24,9 +25,7 @@
             console.log('Token set as cookie:', token);
         }
     });
-</script>
-  
-
+  </script>
   {% endblock %}
 
   <body>
