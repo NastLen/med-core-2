@@ -19,8 +19,8 @@
       <label for="last_name">Last Name:</label>
       <input type="text" id="last_name" name="last_name" value="{{ patient.last_name if patient else '' }}" required /><br /><br />
   
-      <label for="picture">Picture (Base64):</label>
-      <textarea id="picture" name="picture" required>{{ patient.picture if patient else '' }}</textarea><br /><br />
+      <label for="picture">Picture:</label>
+      <input type="file" id="picture" name="picture" accept="image/*" /><br /><br />
   
       <label for="date_of_birth">Date of Birth:</label>
       <input type="date" id="date_of_birth" name="date_of_birth" value="{{ patient.date_of_birth if patient else '' }}" required /><br /><br />

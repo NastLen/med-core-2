@@ -28,6 +28,24 @@
     });
   </script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const logoutLink = document.getElementById('logoutLink');
+      if (logoutLink) {
+          logoutLink.addEventListener('click', function(event) {
+              console.log('Logout link clicked');
+              event.preventDefault();
+              // Remove the token from cookies
+              document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+              // Remove the token from local storage
+              localStorage.removeItem('token');
+              // Redirect to the logout URL
+              window.location.href = '{{ url_for("auth.logout") }}';
+          });
+      }
+  });
+</script>
+
   {% endblock %}
 
   <body>
@@ -37,13 +55,15 @@
           <ul>
 
       {% if 'token' in request.cookies %}
-        <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-        <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+        <li><a href="{{ url_for('index') }}">Home</a></li>
+        <li><a id="logoutLink" href="#">Logout</a></li>
         <li><a href="{{url_for('patients') }}"> Patients </a></li>
         <li><a href="{{url_for('clinics') }}"> Clinics</a></li>
       {% else %}
         <li><a href="{{ url_for('auth.login') }}">Login</a></li>
         <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+        <li><a href="{{ url_for('about') }}"> About </a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
       {% endif %}
       </nav>
 

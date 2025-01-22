@@ -31,7 +31,7 @@ document.getElementById('2faForm').addEventListener('submit', async function (ev
                 localStorage.setItem('token', accessToken);
                 localStorage.removeItem('temporary_token');
  // Store the new access token
-                window.location.href = '/doctor/dashboard';
+                window.location.href = '/patients';
             
             // Redirect to the dashboard (or another page)
             } else {
