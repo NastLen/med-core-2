@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Medical Record{% endblock %}
+
+{% block content %}
+<h1>Medical Record</h1>
+
+<style>
+    input[type="number"],
+    input[type="text"],
+    input[type="file"],
+    textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        height: 150px;
+    }
+
+    .button-style {
+        padding: 10px 20px;
+        margin: 10px 0;
+    }
+</style>
+
+<form id="medicalRecordForm" method="POST">
+    <fieldset>
+        <legend>Medical Record Details</legend>
+        
+        <label for="care_link_id">Care Link ID:</label>
+        <input type="number" id="care_link_id" name="care_link_id" required /><br /><br />
+        
+        <label for="anamnesis">Anamnesis:</label>
+        <textarea id="anamnesis" name="anamnesis"></textarea><br /><br />
+        
+        <label for="evolution">Evolution:</label>
+        <textarea id="evolution" name="evolution"></textarea><br /><br />
+        
+        <label for="appointment_id">Appointment ID:</label>
+        <input type="number" id="appointment_id" name="appointment_id" /><br /><br />
+        
+        <label for="diagnosis">Diagnosis:</label>
+        <textarea id="diagnosis" name="diagnosis"></textarea><br /><br />
+        
+        <label for="pdf_file">PDF File:</label>
+        <input type="file" id="pdf_file" name="pdf_file" /><br /><br />
+    </fieldset>
+    
+    <button type="submit" class="button-style">Submit</button>
+    <button type="button" id="cancelFormButton" class="button-style">Back</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const medicalRecordForm = document.getElementById('medicalRecordForm');
+        medicalRecordForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(medicalRecordForm);
+            const data = {
+                care_link_id: formData.get('care_link_id'),
+                anamnesis: formData.get('anamnesis'),
+                evolution: formData.get('evolution'),
+                appointment_id: formData.get('appointment_id'),
+                diagnosis: formData.get('diagnosis'),
+                pdf_file: formData.get('pdf_file')
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1/api/medical-records', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message);
+                } else {
+                    const error = await response.json();
+                    alert(error.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while submitting the medical record. Please try again.');
+            }
+        });
+    });
+</script>
+{% endblock %}

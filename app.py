@@ -4,6 +4,7 @@ import datetime
 
 
 from flask import Flask, render_template, redirect, url_for, session, request, flash, jsonify
+from flask_cors import CORS
 from flask_login import login_required, LoginManager
 from mysql.connector import Error
 from datetime import timedelta
@@ -14,6 +15,7 @@ from helper_functions import load_form_fields, serialize_data, send_data_to_api,
 
 
 app = Flask(__name__)
+CORS(app)
 app.config['DEBUG'] = True
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 
@@ -63,7 +65,9 @@ def mark_arrived(appointment_id):
     pass
 @app.route('/frontdesk')
 def frontdesk():
-    return render_template('frontdesk.html')@app.route('/clinics')
+    return render_template('frontdesk.html')
+
+@app.route('/clinics')
 def clinics():
     try:
         response = requests.get('http://0.0.0.0:80/api/clinics')
@@ -105,6 +109,10 @@ def clinic_management():
 @app.route('/doctor_management')
 def doctor_management():
     return render_template('./admin/doctor_management.html')
+
+@app.route('/medical_record')
+def medical_record():
+    return render_template('medical_record.html')
 
 @app.route('/patients')
 def patients():
