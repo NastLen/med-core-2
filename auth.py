@@ -86,6 +86,109 @@ def two_fa():
 
 
 
+@auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        # Get data from the JSON body of the request
+        data = request.get_json()  # Expecting JSON data
+        email = data.get('email')  # Extract email from the JSON data
+
+        print(email)  # This will now print the email
+
+        try:
+            # Send the POST request to the /auth/forgot-password API
+            response = requests.post(
+                'http://127.0.0.1:80/auth/forgot-password',
+                json={'email': email},
+                verify = False# Pass the email as JSON
+            )
+            if response.status_code == 200:
+                try:
+                    return jsonify(response.json()), 200
+                except ValueError:
+                    return jsonify({'message': 'Invalid response from login service'}), 500
+            else:
+                return jsonify({'message': 'Unexpected error from login service'}), response.status_code
+        except requests.exceptions.RequestException as e:
+            # Handle any errors related to the request itself
+            return jsonify({'message': str(e)}), 500
+
+    return render_template('auth/forgot-password.html')
+
+@auth_bp.route('/2fa-forgot-password', methods=['GET', "POST"])
+def two_fa_forgot_password():
+    if request.method == 'POST':
+        auth_code = request.json.get('authCode')  # Get the 2FA code entered by the user
+        temporary_token = request.headers.get('Authorization')  # Get the temporary token from headers
+
+        print(f"Received auth_code: {auth_code}")  # Debugging line
+        print(f"Received temporary_token: {temporary_token}")  # Debugging line
+
+        if not temporary_token:
+            return jsonify({"message": "No temporary token found. Please log in first."}), 400
+        
+        # Prepare the payload to forward to /auth/verify-2fa
+        payload = {'verification_code': auth_code}
+        print(f"Payload: {payload}")  # Debugging line
+        
+        # Forward the request to the /auth/verify-2fa endpoint
+        response = requests.post(
+            'http://127.0.0.1:80/api/verify-password-reset', 
+            json=payload,
+            headers={'Authorization': temporary_token}  # Include the temporary token in the header
+        )
+        print(f"Response from /verify-password-reset: {response.status_code}, {response.text}")  # Debugging line
+
+        if response.status_code == 200:
+            data = response.json()
+            return jsonify(data), 200
+
+        else:
+            data = response.json()
+            return jsonify(data), response.status_code
+    
+    return render_template('auth/2fa-forgot-password.html')
+
+
+@auth_bp.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        print("POSTOU")
+        # Correctly retrieve the password using the correct key
+        new_password = request.json.get('new_password')
+        print(new_password)
+
+        # Retrieve the JWT token from the client-side local storage
+        token = request.headers.get('Authorization')  # Assuming the token is stored in the headers
+        print(token)
+
+        if not token:
+            flash('Authorization token missing. Please log in again. back', 'error')
+            return redirect(url_for('auth.login'))
+
+        # Ensure payload is a dictionary
+        payload = {"new_password": new_password}
+
+        # Send the POST request to the /auth/update-password API
+        response = requests.post(
+            'http://127.0.0.1:80/auth/update-password',
+            json=payload,
+            headers={'Authorization': token}  # Include the token in the header
+        )
+        print(f"Response from /update-password-reset: {response.status_code}")
+
+        # Check the response from the API
+        if response.status_code == 200:
+            flash('Password updated successfully. Please log in.', 'success')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Failed to update password. Please try again.', 'error')
+
+    return render_template('auth/reset-password.html')
+
+
+
+
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
