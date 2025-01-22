@@ -160,8 +160,11 @@ def patient_management():
         form_data = serialize_data(form_data)
 
         user_id = get_user_id_from_token()
+        print(user_id)
         first_clinic = get_clinics(user_id)
+        print(first_clinic)
         first_doctor = get_doctors(first_clinic)
+        print(first_clinic)
         patient_id = form_data.get('id')
 
         # if the patient exists, the put method of the api endpoint patient_by_id has to be called
