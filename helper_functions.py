@@ -1,14 +1,31 @@
 import datetime
-import requests
 
-
-from flask import flash
+from jwt import decode
+from flask import flash, current_app, request
 import simplejson as json
+
+def get_user_id_from_token():
+    secret_key = current_app.config['SECRET_KEY']
+    print(f"secret_key  {secret_key}")  
+    token = request.cookies.get('token')
+    print(f"token  inside the helper {token}")
+    if not token:
+        return None
+
+    try:
+        decoded = decode(token, key=secret_key, algorithms=["HS256"], options={"verify_signature": False})
+        user_id = decoded.get('sub', {}).get('id')
+        return user_id
+    except Exception as e:
+        print(f"Error decoding token: {e}")
+        return None
+
 
 def load_form_fields(request):
     form_fields = {}
     for field in request.form:
         form_fields[field] = request.form[field]
+        print(f"field: {field}, value: {request.form[field]}")
     return form_fields
 
 def serialize_data(data):
