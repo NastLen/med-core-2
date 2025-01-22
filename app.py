@@ -56,6 +56,7 @@ def contact():
 def dashboard():
     return render_template('/doctor/dashboard.html')
 
+
 @app.route('/mark_arrived/<int:appointment_id>', methods=['POST'])
 @login_required
 def mark_arrived(appointment_id):
