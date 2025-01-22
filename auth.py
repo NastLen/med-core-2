@@ -5,26 +5,86 @@ from db import engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.sql import text
 from models import construct_user
+import requests
 
 auth_bp = Blueprint('auth', __name__)
+
+import requests
+from flask import request, render_template, jsonify
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        # Ensure the request contains JSON data
+        if not request.is_json:
+            return jsonify({'message': 'Bad request: Missing or invalid JSON data'}), 400
 
-        # Authenticate the user and construct a User object if valid
-        user = authenticate_user(username, password)
-        if user:
-            # Log the user in
-            login_user(user, remember=True)
-            flash('Login successful!', 'success')
-            return redirect(url_for('index'))
+        # Extract username and password from JSON
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+
+        if not username or not password:
+            return jsonify({'message': 'Bad request: Username and password are required'}), 400
+
+        # Forward the request to the login service
+        try:
+            response = requests.post(
+                "http://127.0.0.1:80/auth/login",
+                json={'username': username, 'password': password},
+                verify=False
+            )
+        except requests.RequestException as e:
+            return jsonify({'message': f'Error communicating with login service: {str(e)}'}), 500
+
+        # Handle response from login service
+        if response.status_code == 200:
+            try:
+                return jsonify(response.json()), 200
+            except ValueError:
+                return jsonify({'message': 'Invalid response from login service'}), 500
+        elif response.status_code == 401:
+            return jsonify({'message': 'Invalid username or password'}), 401
         else:
-            flash('Invalid username or password', 'danger')
+            return jsonify({'message': 'Unexpected error from login service'}), response.status_code
 
+    # Handle GET request (render login form)
     return render_template('auth/login.html')
+
+
+
+import requests  # To make the HTTP request to /auth/verify-2fa
+
+@auth_bp.route('/2fa', methods=['GET', 'POST'])
+def two_fa():
+    if request.method == 'POST':
+        auth_code = request.json.get('authCode')  # Get the 2FA code entered by the user
+        temporary_token = request.headers.get('Authorization')  # Get the temporary token from headers
+
+        if not temporary_token:
+            return jsonify({"message": "No temporary token found. Please log in first."}), 400
+        
+        # Prepare the payload to forward to /auth/verify-2fa
+        payload = {'verification_code': auth_code}
+        
+        # Forward the request to the /auth/verify-2fa endpoint
+        response = requests.post(
+            'http://127.0.0.1:80/auth/verify-2fa', 
+            json=payload,
+            headers={'Authorization': temporary_token}  # Include the temporary token in the header
+        )
+
+        # Check the response from the /auth/verify-2fa endpoint
+        if response.status_code == 200:
+            data = response.json()
+            return jsonify(data), 200
+        else:
+            data = response.json()
+            return jsonify(data), response.status_code
+    
+    return render_template('auth/2fa.html')
+
+
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():

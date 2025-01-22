@@ -11,7 +11,10 @@
   </head>
   {% block scripts %}
   <!-- Include any JS files here -->
-  <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+  <script src="{{ url_for('static', filename='scripts/core-functions/login.js') }}"></script>
+  <script src="{{ url_for('static', filename='scripts/core-functions/scripts.js') }}"></script>
+  <script src="{{ url_for('static', filename='scripts/core-functions/2fa.js') }}"></script>
+  
   {% endblock %}
 
   <body>
