@@ -10,7 +10,7 @@ from datetime import timedelta
 from auth import auth_bp, get_user_by_username
 from models import models_bp
 
-from helper_functions import load_form_fields, serialize_data, send_data_to_api, get_user_id_from_token
+from helper_functions import load_form_fields, serialize_data, send_data_to_api, get_user_id_from_token, get_clinics
 
 
 app = Flask(__name__)
@@ -108,11 +108,15 @@ def doctor_management():
 
 @app.route('/patients')
 def patients():
+
+    user_id = get_user_id_from_token()
+    first_clinic = get_clinics(user_id)
+    
     mock_clinic_id = 3
 
 
     try:
-        response = requests.get('http://0.0.0.0:80/api/patients?clinic_id={}'.format(mock_clinic_id))
+        response = requests.get('http://0.0.0.0:80/api/patients?clinic_id={}'.format(first_clinic))
         response.raise_for_status()
         patients_data = response.json().get('patients', [])
     except requests.exceptions.RequestException as e:
