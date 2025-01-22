@@ -45,16 +45,7 @@
 
       </header>
 
-      {% with messages = get_flashed_messages(with_categories=True) %} {% if
-      messages %}
-      <div class="flashes">
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      </div>
-      {% endif %} {% endwith %}
-
-      <main>
+          <main>
         {% block content %}
         <!-- Content from child templates will be injected here -->
         <h2>About Us</h2>
@@ -65,6 +56,15 @@
         </p>
         {% endblock %}
       </main>
+      {% with messages = get_flashed_messages(with_categories=True) %} {% if
+        messages %}
+        <div class="flashes">
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+
       <footer>
         <p>&copy; 2024 Med-Core</p>
       </footer>

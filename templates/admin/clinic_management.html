@@ -4,4 +4,52 @@
 
 {% block content %}
   <h1>Add and modify clinics information</h1>
+
+  <form id="addClinicForm" method="POST">
+    <!-- Clinic Details -->
+    <fieldset>
+      <legend>Clinic Details</legend>
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required /><br /><br />
+  
+      <label for="address">Address:</label>
+      <input type="text" id="address" name="address" required /><br /><br />
+  
+      <label for="address_number">Address Number:</label>
+      <input type="text" id="address_number" name="address_number" required /><br /><br />
+  
+      <label for="address_complement">Address Complement:</label>
+      <input type="text" id="address_complement" name="address_complement" /><br /><br />
+  
+      <label for="zip">ZIP Code:</label>
+      <input type="text" id="zip" name="zip" required /><br /><br />
+  
+      <label for="city">City:</label>
+      <input type="text" id="city" name="city" required /><br /><br />
+  
+      <label for="state">State:</label>
+      <input type="text" id="state" name="state" required /><br /><br />
+  
+      <label for="country">Country:</label>
+      <input type="text" id="country" name="country" required /><br /><br />
+  
+      <label for="phone">Phone:</label>
+      <input type="tel" id="phone" name="phone" required /><br /><br />
+  
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required /><br /><br />
+  
+      <label for="website">Website:</label>
+      <input type="url" id="website" name="website" /><br /><br />
+  
+      <label for="clinic_type">Clinic Type:</label>
+      <input type="text" id="clinic_type" name="clinic_type" required /><br /><br />
+  
+      <label for="user_id">User ID:</label>
+      <input type="number" id="user_id" name="user_id" required /><br /><br />
+    </fieldset>
+  
+    <button type="submit" class="button-style">Submit</button>
+    <button type="button" id="cancelFormButton" class="button-style">Back</button>
+  </form>
 {% endblock %}

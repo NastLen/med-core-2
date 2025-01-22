@@ -1,4 +1,8 @@
 import os
+import requests
+import datetime
+
+
 from flask import Flask, render_template, redirect, url_for, session, request, flash, jsonify
 from flask_login import login_required, LoginManager
 from mysql.connector import Error
@@ -6,10 +10,12 @@ from datetime import timedelta
 from auth import auth_bp, get_user_by_username
 from models import models_bp
 
+from helper_functions import load_form_fields, serialize_data, send_data_to_api
+
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
-app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=7)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 
 # Blueprints
@@ -53,18 +59,70 @@ def dashboard():
 @app.route('/mark_arrived/<int:appointment_id>', methods=['POST'])
 @login_required
 def mark_arrived(appointment_id):
-    pass    
+    pass
 
-@app.route('/clinic_management')
+@app.route('/clinics')
+def clinics():
+    try:
+        response = requests.get('http://0.0.0.0:80/api/clinics')
+        response.raise_for_status()
+        clinics_data = response.json().get('clinics', [])
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching clinics: {e}")
+        clinics_data = []
+
+    return render_template('clinics.html', clinics=clinics_data)
+
+@app.route('/clinic_management', methods=['GET', 'POST'])
 def clinic_management():
+    if request.method == 'POST':
+
+        form_data = load_form_fields(request)
+        form_data['created_at'] = datetime.datetime.now()
+        form_data['updated_at'] = datetime.datetime.now()
+        form_data = serialize_data(form_data)
+
+        print(f"form_data: {form_data}")
+
+
+        send_data_to_api('http://0.0.0.0:80/api/clinics', form_data)
+
     return render_template('./admin/clinic_management.html')
 
 @app.route('/doctor_management')
 def doctor_management():
     return render_template('./admin/doctor_management.html')
 
-@app.route('/patient_management')
+@app.route('/patients')
+def patients():
+    mock_clinic_id = 3
+
+
+    try:
+        response = requests.get('http://0.0.0.0:80/api/patients?clinic_id={}'.format(mock_clinic_id))
+        response.raise_for_status()
+        patients_data = response.json().get('patients', [])
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching patients: {e}")
+        patients_data = []
+
+    return render_template('patients.html', patients=patients_data)
+
+@app.route('/patient_management', methods=['GET', 'POST'])
 def patient_management():
+    if request.method == 'POST':
+
+        form_data = load_form_fields(request)
+        form_data['created_at'] = datetime.datetime.now()
+        form_data['updated_at'] = datetime.datetime.now()
+        form_data = serialize_data(form_data)
+
+        print(f"form_data: {form_data}")
+
+
+        send_data_to_api('http://0.0.0.0:80/api/patients', form_data)
+
+
     return render_template('./admin/patient_management.html')
 
 # Debbugin route to show all the session information
