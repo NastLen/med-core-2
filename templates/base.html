@@ -14,7 +14,7 @@
   <script src="{{ url_for('static', filename='scripts/core-functions/login.js') }}"></script>
   <script src="{{ url_for('static', filename='scripts/core-functions/scripts.js') }}"></script>
   <script src="{{ url_for('static', filename='scripts/core-functions/2fa.js') }}"></script>
-  
+
   {% endblock %}
 
   <body>
@@ -22,51 +22,42 @@
       <header>
         <nav>
           <ul>
-              <li><a href="{{ url_for('index') }}">Home</a></li>
-              <li><a href="{{ url_for('about') }}">About Us</a></li>
-              <li><a href="{{ url_for('contact') }}">Contact</a></li>
-              
-              {% if current_user.is_authenticated %}
-                      {% if current_user.is_admin %}
-                      <li><a href="{{ url_for('clinic_management') }}">Manage Clinics</a></li>
-                      <li><a href="{{ url_for('doctor_management') }}">Manage Doctors</a></li>
-                      <li><a href="{{ url_for('patient_management') }}">Manage Patients</a></li>
-                  {% endif %}
-      
-                  {% if current_user.healthcare_professional %}
-                      <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-                      <li><a href="{{ url_for('schedule') }}">Schedule</a></li>
-                      <li><a href="{{ url_for('patient_management') }}">Manage Patients</a></li>
-                  {% endif %}
-      
-                  <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
-              {% else %}
-                  <li><a href="{{ url_for('auth.login') }}">Login</a></li>
-              {% endif %}
-          </ul>
-      </nav>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('about') }}">About Us</a></li>
+            <li><a href="{{ url_for('contact') }}">Contact</a></li>
 
+            {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('clinics') }}">Clinics</a></li>
+            <li><a href="{{ url_for('patients') }}">Patients</a></li>
+            <li><a href="{{ url_for('frontdesk') }}">Front Desk</a></li>
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+            {% else %}
+            <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+            <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+            {% endif %}
+          </ul>
+        </nav>
       </header>
 
-          <main>
+      <main>
         {% block content %}
         <!-- Content from child templates will be injected here -->
         <h2>About Us</h2>
         <p>
-
           Welcome to our EHR system. Here you can find information about our
           services.
         </p>
         {% endblock %}
       </main>
       {% with messages = get_flashed_messages(with_categories=True) %} {% if
-        messages %}
-        <div class="flashes">
-          {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
-          {% endfor %}
-        </div>
-        {% endif %} {% endwith %}
+      messages %}
+      <div class="flashes">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
 
       <footer>
         <p>&copy; 2024 Med-Core</p>

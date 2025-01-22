@@ -62,6 +62,14 @@ def dashboard():
 def mark_arrived(appointment_id):
     pass
 
+
+
+@app.route('/frontdesk')
+def frontdesk():
+    return render_template('frontdesk.html')
+
+
+
 @app.route('/clinics')
 def clinics():
     try:

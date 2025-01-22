@@ -9,7 +9,7 @@ services:
       MYSQL_USER: medcore
       MYSQL_PASSWORD: medcorepassword
     ports:
-      - "3306:3306"
+      - "3306:3308"
     volumes:
       - ./db_data:/var/lib/mysql  # Ensure the data is stored in db_data directory inside your project
 
