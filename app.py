@@ -10,7 +10,7 @@ from datetime import timedelta
 from auth import auth_bp, get_user_by_username
 from models import models_bp
 
-from helper_functions import load_form_fields, serialize_data, send_data_to_api, get_user_id_from_token, get_clinics
+from helper_functions import load_form_fields, serialize_data, send_data_to_api, get_user_id_from_token, get_clinics, get_doctors, patient_exists
 
 
 app = Flask(__name__)
@@ -61,16 +61,9 @@ def dashboard():
 @login_required
 def mark_arrived(appointment_id):
     pass
-
-
-
 @app.route('/frontdesk')
 def frontdesk():
-    return render_template('frontdesk.html')
-
-
-
-@app.route('/clinics')
+    return render_template('frontdesk.html')@app.route('/clinics')
 def clinics():
     try:
         response = requests.get('http://0.0.0.0:80/api/clinics')
@@ -78,8 +71,7 @@ def clinics():
         clinics_data = response.json().get('clinics', [])
 
         user_id = get_user_id_from_token()
-        print(user_id)
-
+      
     except requests.exceptions.RequestException as e:
         print(f"Error fetching clinics: {e}")
         
@@ -119,8 +111,6 @@ def patients():
 
     user_id = get_user_id_from_token()
     first_clinic = get_clinics(user_id)
-    
-    mock_clinic_id = 3
 
 
     try:
@@ -137,16 +127,46 @@ def patients():
 def patient_management():
     if request.method == 'POST':
 
+
         form_data = load_form_fields(request)
         form_data['created_at'] = datetime.datetime.now()
         form_data['updated_at'] = datetime.datetime.now()
         form_data = serialize_data(form_data)
 
-        print(f"form_data: {form_data}")
+        user_id = get_user_id_from_token()
+        first_clinic = get_clinics(user_id)
+        first_doctor = get_doctors(first_clinic)
+        patient_id = form_data.get('id')
 
+        # if the patient exists, the put method of the api endpoint patient_by_id has to be called
+        print("********** PATIENT EXISTS: {} **********".format(patient_exists(patient_id)))
 
-        send_data_to_api('http://0.0.0.0:80/api/patients', form_data)
+        if patient_exists(patient_id):
+            send_data_to_api(f'http://0.0.0.0:80/api/patient_by_id/{patient_id}', form_data, method='PUT')
+        else:
+            form_data['clinic_id'] = first_clinic
+            form_data['doctor_id'] = first_doctor
+            send_data_to_api('http://0.0.0.0:80/api/patients', form_data)
 
+        return redirect(url_for('patients'))
+
+    if request.method == 'GET':
+        patient_id = request.args.get('patient_id')
+        print(f"Patient ID: {patient_id}")
+        if patient_id:
+            print("ENTROUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+            try:
+                response = requests.get(f'http://0.0.0.0:80/api/patient_by_id/{patient_id}')
+                response.raise_for_status()
+                patient_data = response.json().get('patient', {})
+                print(f"Patient data: {patient_data}")
+            except requests.exceptions.RequestException as e:
+                print(f"Error fetching patient: {e}")
+                patient_data = {}
+        else:
+            patient_data = {}
+
+        return render_template('./admin/patient_management.html', patient=patient_data)
 
     return render_template('./admin/patient_management.html')
 

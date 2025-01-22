@@ -35,6 +35,22 @@ def get_clinics(user_id):
     else:
         return None
 
+def get_doctors(clinic_id):
+    try:
+        response = requests.get(f'http://0.0.0.0:80/api/doctors?clinic_id={clinic_id}')
+        response.raise_for_status()
+        professionals_data = response.json().get('professionals', [])
+        print("********** PROFESSIONALS DATA **********")
+        print(professionals_data)
+        print("**********************************")
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching professionals: {e}")
+        professionals_data = []
+    
+    if professionals_data:
+        return professionals_data[0]['id']
+    else:
+        return None
 
 
 def load_form_fields(request):
@@ -54,13 +70,28 @@ def serialize_data(data):
     return {k: (json_serial(v) if isinstance(v, (datetime.datetime, datetime.date)) else v) for k, v in data.items()}
 
 
-def send_data_to_api(url, data):
+def send_data_to_api(url, data, method='post', **kwargs):
     try:
-        print(f"Sending data to API: {data}")  # Add this line to print the data
-        response = requests.post(url, json=data)
+        if method.lower() == 'post':
+            response = requests.post(url, json=data, **kwargs)
+        elif method.lower() == 'put':
+            response = requests.put(url, json=data, **kwargs)
+        else:
+            raise ValueError("Unsupported method: {}".format(method))
+        
         response.raise_for_status()
         print("success")
         flash('Data sent successfully!', 'success')
     except requests.exceptions.RequestException as e:
         print(f"error: {e}")
         flash('Failed to send data.', 'danger')
+
+def patient_exists(patient_id):
+    try:
+        response = requests.get(f'http://127.0.0.1/api/patient_by_id/{patient_id}')
+        response.raise_for_status()
+        patient_data = response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching patient: {e}")
+        patient_data = {}
+    return bool(patient_data)

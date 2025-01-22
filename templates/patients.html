@@ -1,5 +1,8 @@
-{% extends "base.html" %} {% block title %}Patients list{% endblock %} {% block
-content %}
+{% extends "base.html" %}
+
+{% block title %}Patients list{% endblock %}
+
+{% block content %}
 <h1>Patients list</h1>
 
 <style>
@@ -34,13 +37,7 @@ content %}
       <th>Phone</th>
       <th>Email</th>
       <th>Status</th>
-      <th>Emergency Contact Name</th>
-      <th>Emergency Contact Phone</th>
-      <th>Nationality</th>
-      <th>Language</th>
-      <th>Insurance Provider</th>
-      <th>Insurance Policy Number</th>
-      <th>Created At</th>
+      <th>Edit</th>
     </tr>
   </thead>
   <tbody>
@@ -58,13 +55,7 @@ content %}
       <td>{{ patient.phone }}</td>
       <td>{{ patient.email }}</td>
       <td>{{ patient.status }}</td>
-      <td>{{ patient.emergency_contact_name }}</td>
-      <td>{{ patient.emergency_contact_phone }}</td>
-      <td>{{ patient.nationality }}</td>
-      <td>{{ patient.language }}</td>
-      <td>{{ patient.insurance_provider }}</td>
-      <td>{{ patient.insurance_policy_number }}</td>
-      <td>{{ patient.created_at }}</td>
+      <td><a href="{{ url_for('patient_management', patient_id=patient.id) }}">Edit</a></td>
     </tr>
     {% endfor %}
   </tbody>

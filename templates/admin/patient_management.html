@@ -3,93 +3,90 @@
 {% block title %}Patient Management{% endblock %}
 
 {% block content %}
+<h1>Add patients, change patient information</h1>
+
+<form id="addPatientForm" method="POST">
+
+  <input type="hidden" id="id" name="id" value="{{ patient.id if patient else '' }}" />
 
 
-
-
-
-
-  <h1>Add patients, change patient information</h1>
-
-
-  <form id="addPatientForm" method="POST">
     <!-- Patient Details -->
     <fieldset>
       <legend>Patient Details</legend>
       <label for="first_name">First Name:</label>
-      <input type="text" id="first_name" name="first_name" required /><br /><br />
+      <input type="text" id="first_name" name="first_name" value="{{ patient.first_name if patient else '' }}" required /><br /><br />
   
       <label for="last_name">Last Name:</label>
-      <input type="text" id="last_name" name="last_name" required /><br /><br />
+      <input type="text" id="last_name" name="last_name" value="{{ patient.last_name if patient else '' }}" required /><br /><br />
   
       <label for="picture">Picture (Base64):</label>
-      <textarea id="picture" name="picture" required></textarea><br /><br />
+      <textarea id="picture" name="picture" required>{{ patient.picture if patient else '' }}</textarea><br /><br />
   
       <label for="date_of_birth">Date of Birth:</label>
-      <input type="date" id="date_of_birth" name="date_of_birth" required /><br /><br />
+      <input type="date" id="date_of_birth" name="date_of_birth" value="{{ patient.date_of_birth if patient else '' }}" required /><br /><br />
   
       <label for="gender">Gender:</label>
       <select id="gender" name="gender">
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-        <option value="other">Other</option>
+        <option value="male" {% if patient and patient.gender == 'male' %}selected{% endif %}>Male</option>
+        <option value="female" {% if patient and patient.gender == 'female' %}selected{% endif %}>Female</option>
+        <option value="other" {% if patient and patient.gender == 'other' %}selected{% endif %}>Other</option>
       </select><br /><br />
   
       <label for="address">Address:</label>
-      <input type="text" id="address" name="address" required /><br /><br />
+      <input type="text" id="address" name="address" value="{{ patient.address if patient else '' }}" required /><br /><br />
   
       <label for="address_number">Address Number:</label>
-      <input type="text" id="address_number" name="address_number" required /><br /><br />
+      <input type="text" id="address_number" name="address_number" value="{{ patient.address_number if patient else '' }}" required /><br /><br />
   
       <label for="address_complement">Address Complement:</label>
-      <input type="text" id="address_complement" name="address_complement" /><br /><br />
+      <input type="text" id="address_complement" name="address_complement" value="{{ patient.address_complement if patient else '' }}" /><br /><br />
   
       <label for="zip">ZIP Code:</label>
-      <input type="text" id="zip" name="zip" required /><br /><br />
+      <input type="text" id="zip" name="zip" value="{{ patient.zip if patient else '' }}" required /><br /><br />
   
       <label for="phone">Phone:</label>
-      <input type="tel" id="phone" name="phone" required /><br /><br />
+      <input type="tel" id="phone" name="phone" value="{{ patient.phone if patient else '' }}" required /><br /><br />
   
       <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required /><br /><br />
+      <input type="email" id="email" name="email" value="{{ patient.email if patient else '' }}" required /><br /><br />
   
       <label for="status">Status:</label>
       <select id="status" name="status">
-        <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
+        <option value="active" {% if patient and patient.status == 'active' %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if patient and patient.status == 'inactive' %}selected{% endif %}>Inactive</option>
       </select><br /><br />
   
       <label for="emergency_contact_name">Emergency Contact Name:</label>
-      <input type="text" id="emergency_contact_name" name="emergency_contact_name" required /><br /><br />
+      <input type="text" id="emergency_contact_name" name="emergency_contact_name" value="{{ patient.emergency_contact_name if patient else '' }}" required /><br /><br />
   
       <label for="emergency_contact_phone">Emergency Contact Phone:</label>
-      <input type="tel" id="emergency_contact_phone" name="emergency_contact_phone" required /><br /><br />
+      <input type="tel" id="emergency_contact_phone" name="emergency_contact_phone" value="{{ patient.emergency_contact_phone if patient else '' }}" required /><br /><br />
   
       <label for="nationality">Nationality:</label>
-      <input type="text" id="nationality" name="nationality" required /><br /><br />
+      <input type="text" id="nationality" name="nationality" value="{{ patient.nationality if patient else '' }}" required /><br /><br />
   
       <label for="language">Language:</label>
-      <input type="text" id="language" name="language" required /><br /><br />
+      <input type="text" id="language" name="language" value="{{ patient.language if patient else '' }}" required /><br /><br />
   
       <label for="insurance_provider">Insurance Provider:</label>
-      <input type="text" id="insurance_provider" name="insurance_provider" required /><br /><br />
+      <input type="text" id="insurance_provider" name="insurance_provider" value="{{ patient.insurance_provider if patient else '' }}" required /><br /><br />
   
       <label for="insurance_policy_number">Insurance Policy Number:</label>
-      <input type="text" id="insurance_policy_number" name="insurance_policy_number" required /><br /><br />
+      <input type="text" id="insurance_policy_number" name="insurance_policy_number" value="{{ patient.insurance_policy_number if patient else '' }}" required /><br /><br />
     </fieldset>
   
     <!-- Care Link Details -->
     <fieldset>
       <legend>Care Link</legend>
       <label for="clinic_id">Clinic ID:</label>
-      <input type="number" id="clinic_id" name="clinic_id" placeholder="Enter clinic ID" /><br /><br />
+      <input type="number" id="clinic_id" name="clinic_id" value="{{ patient.clinic_id if patient else '' }}" placeholder="Enter clinic ID" /><br /><br />
     </fieldset>
   
     <button type="submit" class="button-style">Submit</button>
     <button type="button" id="cancelFormButton" class="button-style">Back</button>
-  </form>
+</form>
 
-  {% block scripts %}
+{% block scripts %}
 
   <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 
