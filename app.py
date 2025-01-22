@@ -10,6 +10,7 @@ from mysql.connector import Error
 from datetime import timedelta
 from auth import auth_bp, get_user_by_username
 from models import models_bp
+import requests
 
 from helper_functions import load_form_fields, serialize_data, send_data_to_api, get_user_id_from_token, get_clinics, get_doctors, patient_exists
 
@@ -49,9 +50,34 @@ def index():
 def about():
     return render_template('about.html')
 
-@app.route('/contact')
+@app.route('/contact', methods=['GET', 'POST'])
 def contact():
+    if request.method == 'POST':
+        # Get data from the contact form
+        name = request.form.get('name')
+        email = request.form.get('email')
+        message_content = request.form.get('message')
+
+        # Send the POST request to the /auth/contact API
+        response = requests.post(
+            'http://127.0.0.1:80/auth/contact', 
+            json={  # Pass the form data as JSON
+                'name': name,
+                'email': email,
+                'message': message_content
+            }
+        )
+        
+        # Check the response from the API
+        if response.status_code == 200:
+            return redirect(url_for('about'))
+        else:
+            flash('There was an issue sending your message. Please try again later.', 'danger')
+
+          # Redirect back to the contact form
+
     return render_template('contact.html')
+
 
 @app.route('/dashboard')
 @login_required
@@ -142,8 +168,11 @@ def patient_management():
         form_data = serialize_data(form_data)
 
         user_id = get_user_id_from_token()
+        print(user_id)
         first_clinic = get_clinics(user_id)
+        print(first_clinic)
         first_doctor = get_doctors(first_clinic)
+        print(first_clinic)
         patient_id = form_data.get('id')
 
         # if the patient exists, the put method of the api endpoint patient_by_id has to be called
