@@ -3,6 +3,12 @@
 {% block title %}Patient Management{% endblock %}
 
 {% block content %}
+
+
+
+
+
+
   <h1>Add patients, change patient information</h1>
 
 
@@ -82,5 +88,43 @@
     <button type="submit" class="button-style">Submit</button>
     <button type="button" id="cancelFormButton" class="button-style">Back</button>
   </form>
+
+  {% block scripts %}
+
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const token = localStorage.getItem('token');
+          if (token) {
+              const decodedToken = jwt_decode(token);
+              console.log('Decoded Token:', decodedToken);  // Print the decoded token for debugging
+  
+              // Example: Accessing specific data from the token
+          const userId = decodedToken.sub.id;
+          const userName = decodedToken.sub.name;
+          console.log('User ID:', userId);
+          console.log('User Name:', userName);
+
+          function attachTokenToForm(formId) {
+              const form = document.getElementById(formId);
+              if (form && token) {
+                  const hiddenInput = document.createElement('input');
+                  hiddenInput.type = 'hidden';
+                  hiddenInput.name = 'user_id';
+                  hiddenInput.value = userId
+                  form.appendChild(hiddenInput);
+              }
+          }
+  
+          // Attach token to the patient form
+          attachTokenToForm('addPatientForm');
+          }
+      });
+  </script>
+
+
+
+  {% endblock %}
 
 {% endblock %}
