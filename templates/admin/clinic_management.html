@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Patient Management{% endblock %}
+{% block title %}Clinic Management{% endblock %}
 
 {% block content %}
-  <h1>Add and modify clinics information</h1>
+  <h1>Clinic Management</h1>
 
-  <form id="addClinicForm" method="POST">
+  <form id="clinicForm" method="POST">
     <!-- Clinic Details -->
     <fieldset>
       <legend>Clinic Details</legend>
@@ -27,11 +27,11 @@
       <label for="city">City:</label>
       <input type="text" id="city" name="city" required /><br /><br />
   
-      <label for="state">State:</label>
-      <input type="text" id="state" name="state" required /><br /><br />
+
+      <input type="hidden" id="state" value="SP" name="state" required /><br /><br />
   
-      <label for="country">Country:</label>
-      <input type="text" id="country" name="country" required /><br /><br />
+
+      <input type="hidden" id="country" name="country" value="BR" required /><br /><br />
   
       <label for="phone">Phone:</label>
       <input type="tel" id="phone" name="phone" required /><br /><br />
@@ -42,14 +42,30 @@
       <label for="website">Website:</label>
       <input type="url" id="website" name="website" /><br /><br />
   
-      <label for="clinic_type">Clinic Type:</label>
-      <input type="text" id="clinic_type" name="clinic_type" required /><br /><br />
+      <input type="hidden" id="clinic_type" name="clinic_type" value="Private" />
   
-      <label for="user_id">User ID:</label>
+      <label type="hidden" for="user_id">User ID:</label>
       <input type="number" id="user_id" name="user_id" required /><br /><br />
     </fieldset>
   
     <button type="submit" class="button-style">Submit</button>
     <button type="button" id="cancelFormButton" class="button-style">Back</button>
   </form>
+
+  {% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const token = localStorage.getItem('token');
+          console.log(token);
+          if (token) {
+              const decodedToken = jwt_decode(token);
+              const userId = decodedToken.sub.id; // Adjust this based on your token structure
+              document.getElementById('user_id').value = userId;
+              console.log(userId);
+          }
+      });
+  </script>
+  {% endblock %}
+
 {% endblock %}

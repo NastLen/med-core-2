@@ -191,6 +191,7 @@ def reset_password():
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+
         # Get form data
         username = request.form.get('username')
         password = request.form.get('password')
@@ -218,6 +219,7 @@ def register():
             return redirect(url_for('auth.login'))
         else:
             flash('There was an issue with registration. Please try again.', 'danger')
+
 
     # Render the registration page for GET requests
     return render_template('auth/register.html')
