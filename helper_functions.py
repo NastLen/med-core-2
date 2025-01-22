@@ -1,6 +1,6 @@
 import datetime
 
-from jwt import decode
+import jwt
 from flask import flash, current_app, request
 import simplejson as json
 import requests
@@ -14,7 +14,7 @@ def get_user_id_from_token():
         return None
 
     try:
-        decoded = decode(token, key=secret_key, algorithms=["HS256"], options={"verify_signature": False})
+        decoded = jwt.decode(token, key=secret_key, algorithms=["HS256"], options={"verify_signature": False})
         user_id = decoded.get('sub', {}).get('id')
         return user_id
     except Exception as e:
@@ -23,7 +23,7 @@ def get_user_id_from_token():
     
 def get_clinics(user_id):
     try:
-        response = requests.get('http://0.0.0.0:80/api/clinics?user_id={}'.format(user_id))
+        response = requests.get('http://127.0.0.1:80/api/clinics?user_id={}'.format(user_id))
         response.raise_for_status()
         clinics_data = response.json().get('clinics', [])
         print(clinics_data)
@@ -37,7 +37,7 @@ def get_clinics(user_id):
 
 def get_doctors(clinic_id):
     try:
-        response = requests.get(f'http://0.0.0.0:80/api/doctors?clinic_id={clinic_id}')
+        response = requests.get(f'http://127.0.0.1:80/api/doctors?clinic_id={clinic_id}')
         response.raise_for_status()
         professionals_data = response.json().get('professionals', [])
         print("********** PROFESSIONALS DATA **********")
@@ -88,7 +88,7 @@ def send_data_to_api(url, data, method='post', **kwargs):
 
 def patient_exists(patient_id):
     try:
-        response = requests.get(f'http://127.0.0.1/api/patient_by_id/{patient_id}')
+        response = requests.get(f'http://127.0.0.1:80/api/patient_by_id/{patient_id}')
         response.raise_for_status()
         patient_data = response.json()
     except requests.exceptions.RequestException as e:

@@ -188,31 +188,40 @@ def reset_password():
 
 
 
-
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        # Get form data
         username = request.form.get('username')
         password = request.form.get('password')
+        email = request.form.get('email')
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        is_doctor = request.form.get('is_doctor')
 
-        # Hash the password
-        password_hash = generate_password_hash(password)
+        # Send the POST request to the /auth/register API
+        response = requests.post(
+            'http://127.0.0.1:80/auth/register',
+            json={  # Pass the form data as JSON
+                'username': username,
+                'password': password,
+                'email': email,
+                'name': name,
+                'phone': phone,
+                'is_doctor': is_doctor
+            }
+        )
 
-        # Check if the username already exists
-        existing_user = get_user_by_username(username)
-        if existing_user:
-            flash('Username already taken!', 'danger')
-            return redirect(url_for('auth.register'))
-
-        try:
-            save_user_in_db(username, password_hash)  # This is now atomic
-            flash('User registered successfully!', 'success')
+        # Check the response from the API
+        if response.status_code == 201:
+            flash('Registration successful! Please log in.', 'success')
             return redirect(url_for('auth.login'))
-        except RuntimeError as e:
-            flash(f'Error registering user: {e}', 'danger')
-            return redirect(url_for('auth.register'))
+        else:
+            flash('There was an issue with registration. Please try again.', 'danger')
 
+    # Render the registration page for GET requests
     return render_template('auth/register.html')
+
 
 
 def save_user_in_db(username, password_hash):
