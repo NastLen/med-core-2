@@ -3,6 +3,53 @@
 {% block title %}Patients list{% endblock %}
 
 {% block content %}
+
+<style>
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-family: 'Roboto', sans-serif;
+}
+
+thead {
+    background-color: #3498db;
+    color: #fff;
+}
+
+th, td {
+    padding: 12px 16px;
+    text-align: left;
+}
+
+th {
+    font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f5f5f5;
+}
+
+tbody tr:hover {
+    background-color: #e6e6e6;
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #2980b9;
+}
+
+</style>
+
 <h1>Patients list</h1>
 <h2> <a href="{{ url_for('patient_management') }}"> Add patient</a></h2>
 
@@ -28,12 +75,13 @@
     <tr>
       <th>First Name</th>
       <th>Last Name</th>
-      <th>Picture</th>
       <th>Date of Birth</th>
+      <th>Age</th>
       <th>Gender</th>
-    
       <th>Phone</th>
       <th>Email</th>
+      <th>Insurance Provider</th>
+      <th>Insurance Number</th>
       <th>Edit</th>
       <th>Medical record</th>
     </tr>
@@ -43,12 +91,14 @@
     <tr>
       <td>{{ patient.first_name }}</td>
       <td>{{ patient.last_name }}</td>
-      <td>{{ patient.picture }}</td>
       <td>{{ patient.date_of_birth }}</td>
+      <td>{{ patient.age }} </td>
       <td>{{ patient.gender }}</td>
-      
       <td>{{ patient.phone }}</td>
       <td>{{ patient.email }}</td>
+      <td>{{ patient.insurance_provider }}</td>
+      <td>{{ patient.insurance_policy_number }}</td>
+
       
       <td><a href="{{ url_for('patient_management', patient_id=patient.id) }}">Edit</a></td>
       <td><a href="{{ url_for('medical_record', care_link_id=patient.care_link_id, first_name=patient.first_name, last_name=patient.last_name) }}">New consultation</a></td>

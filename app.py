@@ -186,17 +186,21 @@ def patients():
             patient_id = patient['id']
             doctor_id = first_doctor
             care_link_id = search_care_link(doctor_id, first_clinic, patient_id)
-            print(patient)
-
-            print("********** CARE LINK ID **********")
-            print(f"Care link ID: {care_link_id}")
             patient['care_link_id'] = care_link_id
-            print(patient)
-            print("********** CARE LINK ID **********")
+            birth_date = patient.get('date_of_birth')
+            if birth_date:
+                birth_date = datetime.datetime.strptime(birth_date, '%Y-%m-%d')
+                today = datetime.datetime.today()
+                age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+                patient['age'] = age
+                print("********** PATIENT AGE **********")
+                print(patient['age'])
+
 
     except requests.exceptions.RequestException as e:
         print(f"Error fetching patients: {e}")
         patients_data = []
+
 
     return render_template('patients.html', patients=patients_data)
 
@@ -206,7 +210,7 @@ def patient_management():
     if request.method == 'POST':
 
 
-        form_data = load_form_fields(request)
+        form_data = request.form.to_dict()
         form_data['created_at'] = datetime.datetime.now()
         form_data['updated_at'] = datetime.datetime.now()
         form_data = serialize_data(form_data)
