@@ -31,14 +31,11 @@
       <th>Picture</th>
       <th>Date of Birth</th>
       <th>Gender</th>
-      <th>Address</th>
-      <th>Address Number</th>
-      <th>Address Complement</th>
-      <th>ZIP</th>
+    
       <th>Phone</th>
       <th>Email</th>
-      <th>Status</th>
       <th>Edit</th>
+      <th>Medical record</th>
     </tr>
   </thead>
   <tbody>
@@ -49,14 +46,12 @@
       <td>{{ patient.picture }}</td>
       <td>{{ patient.date_of_birth }}</td>
       <td>{{ patient.gender }}</td>
-      <td>{{ patient.address }}</td>
-      <td>{{ patient.address_number }}</td>
-      <td>{{ patient.address_complement }}</td>
-      <td>{{ patient.zip }}</td>
+      
       <td>{{ patient.phone }}</td>
       <td>{{ patient.email }}</td>
-      <td>{{ patient.status }}</td>
+      
       <td><a href="{{ url_for('patient_management', patient_id=patient.id) }}">Edit</a></td>
+      <td><a href="{{ url_for('medical_record', care_link_id=patient.care_link_id, first_name=patient.first_name, last_name=patient.last_name) }}">New consultation</a></td>
     </tr>
     {% endfor %}
   </tbody>

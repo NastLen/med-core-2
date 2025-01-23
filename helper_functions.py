@@ -95,3 +95,36 @@ def patient_exists(patient_id):
         print(f"Error fetching patient: {e}")
         patient_data = {}
     return bool(patient_data)
+
+def search_care_link(doctor_id, clinic_id, patient_id):
+    print("=====================================================================================================")
+    print(f"doctor_id: {doctor_id}, clinic_id: {clinic_id}, patient_id: {patient_id}")
+    print("=====================================================================================================")
+    try:
+        response = requests.get(
+            'http://127.0.0.1:80/api/care_link',
+            params={
+                'doctor_id': doctor_id,
+                'clinic_id': clinic_id,
+                'patient_id': patient_id
+            }
+        )
+        print(f"Request URL: {response.url}")
+        response.raise_for_status()
+        care_link_data = response.json()
+        return care_link_data
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching care link: {e}")
+        flash('Failed to fetch care link.', 'danger')
+        return None
+    
+
+def retrieve_patient_data(patient_id):
+    try:
+        response = requests.get(f'http://127.0.0.1:80/api/patient_by_id/{patient_id}')
+        response.raise_for_status()
+        patient_data = response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching patient: {e}")
+        patient_data = {}
+    return patient_data

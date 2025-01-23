@@ -12,7 +12,17 @@ from auth import auth_bp, get_user_by_username
 from models import models_bp
 import requests
 
-from helper_functions import load_form_fields, serialize_data, send_data_to_api, get_user_id_from_token, get_clinics, get_doctors, patient_exists
+from helper_functions import (
+    load_form_fields, 
+    serialize_data, 
+    send_data_to_api, 
+    get_user_id_from_token, 
+    get_clinics, 
+    get_doctors, 
+    patient_exists, 
+    search_care_link,
+    retrieve_patient_data
+)
 
 
 app = Flask(__name__)
@@ -95,18 +105,19 @@ def frontdesk():
 
 @app.route('/clinics')
 def clinics():
+    user_id = get_user_id_from_token()
     try:
-        response = requests.get('http://0.0.0.0:80/api/clinics')
+        response = requests.get('http://0.0.0.0:80/api/clinics?user_id={}'.format(user_id))
         response.raise_for_status()
         clinics_data = response.json().get('clinics', [])
 
-        user_id = get_user_id_from_token()
+        
       
     except requests.exceptions.RequestException as e:
         print(f"Error fetching clinics: {e}")
         
         try:
-            response = requests.get('http://0.0.0.0:80/api/clinics')
+            response = requests.get('http://0.0.0.0:80/api/clinics?user_id={}'.format(user_id))
             response.raise_for_status()
             clinics_data = response.json().get('clinics', [])
         except requests.exceptions.RequestException as e:
@@ -117,6 +128,7 @@ def clinics():
 
 @app.route('/clinic_management', methods=['GET', 'POST'])
 def clinic_management():
+    user_id = get_user_id_from_token()
     if request.method == 'POST':
 
         form_data = load_form_fields(request)
@@ -130,7 +142,7 @@ def clinic_management():
 
         send_data_to_api('http://0.0.0.0:80/api/clinics', form_data)
 
-    return render_template('./admin/clinic_management.html')
+    return render_template('./admin/clinic_management.html', user_id=user_id)
 
 @app.route('/doctor_management')
 def doctor_management():
@@ -138,24 +150,56 @@ def doctor_management():
 
 @app.route('/medical_record')
 def medical_record():
-    return render_template('medical_record.html')
+    care_link_id = request.args.get('care_link_id')
+    first_name = request.args.get('first_name')
+    last_name = request.args.get('last_name')
+
+    patient = retrieve_patient_data(care_link_id)
+
+    if request.method == 'POST':
+        form_data = load_form_fields(request)
+        form_data['created_at'] = datetime.datetime.now()
+        form_data['updated_at'] = datetime.datetime.now()
+        form_data = serialize_data(form_data)
+        send_data_to_api('http://127.0.0.1:80/api/medical-records', form_data)
+    
+    care_link_id = request.args.get('care_link_id')
+
+    
+
+
+
+    return render_template('medical_record.html', care_link_id=care_link_id, first_name=first_name, last_name=last_name, patient=patient)
 
 @app.route('/patients')
 def patients():
-
     user_id = get_user_id_from_token()
     first_clinic = get_clinics(user_id)
-
+    first_doctor = get_doctors(first_clinic)
 
     try:
         response = requests.get('http://0.0.0.0:80/api/patients?clinic_id={}'.format(first_clinic))
         response.raise_for_status()
         patients_data = response.json().get('patients', [])
+        # Associate care links for each patient
+        for patient in patients_data:
+            patient_id = patient['id']
+            doctor_id = first_doctor
+            care_link_id = search_care_link(doctor_id, first_clinic, patient_id)
+            print(patient)
+
+            print("********** CARE LINK ID **********")
+            print(f"Care link ID: {care_link_id}")
+            patient['care_link_id'] = care_link_id
+            print(patient)
+            print("********** CARE LINK ID **********")
+
     except requests.exceptions.RequestException as e:
         print(f"Error fetching patients: {e}")
         patients_data = []
 
     return render_template('patients.html', patients=patients_data)
+
 
 @app.route('/patient_management', methods=['GET', 'POST'])
 def patient_management():
@@ -168,15 +212,9 @@ def patient_management():
         form_data = serialize_data(form_data)
 
         user_id = get_user_id_from_token()
-        print(user_id)
         first_clinic = get_clinics(user_id)
-        print(first_clinic)
         first_doctor = get_doctors(first_clinic)
-        print(first_clinic)
         patient_id = form_data.get('id')
-
-        # if the patient exists, the put method of the api endpoint patient_by_id has to be called
-        print("********** PATIENT EXISTS: {} **********".format(patient_exists(patient_id)))
 
         if patient_exists(patient_id):
             send_data_to_api(f'http://0.0.0.0:80/api/patient_by_id/{patient_id}', form_data, method='PUT')
@@ -189,14 +227,18 @@ def patient_management():
 
     if request.method == 'GET':
         patient_id = request.args.get('patient_id')
-        print(f"Patient ID: {patient_id}")
+        user_id = get_user_id_from_token()
+        first_clinic = get_clinics(user_id)
+        first_doctor = get_doctors(first_clinic)
+        care_link_id = search_care_link(patient_id, first_clinic, first_doctor)
+
         if patient_id:
-            print("ENTROUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
             try:
                 response = requests.get(f'http://0.0.0.0:80/api/patient_by_id/{patient_id}')
                 response.raise_for_status()
                 patient_data = response.json().get('patient', {})
-                print(f"Patient data: {patient_data}")
+                patient_data['care_link_id'] = care_link_id
+
             except requests.exceptions.RequestException as e:
                 print(f"Error fetching patient: {e}")
                 patient_data = {}

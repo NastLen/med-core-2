@@ -1,57 +1,139 @@
 {% extends "base.html" %}
 
-{% block title %}Medical Record{% endblock %}
+{% block title %}New Record{% endblock %}
 
 {% block content %}
-<h1>Medical Record</h1>
 
 <style>
-    input[type="number"],
-    input[type="text"],
-    input[type="file"],
-    textarea {
-        width: 100%;
-        padding: 10px;
-        margin: 5px 0;
-        box-sizing: border-box;
-    }
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #f4f7f6;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
 
-    textarea {
-        height: 150px;
-    }
+.medical-record-form {
+    max-width: 800px;
+    margin: 30px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
-    .button-style {
-        padding: 10px 20px;
-        margin: 10px 0;
-    }
+h1, h2 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 2.2rem;
+}
+
+h2 {
+    font-size: 1.6rem;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 150px;
+}
+
+.button-style {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 10px 5px 10px 0;
+    transition: background-color 0.3s;
+}
+
+.button-style:hover {
+    background-color: #2980b9;
+}
+
+.previous-records {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.record {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    width: 100%;
+    max-width: 600px;
+}
 </style>
+<h1>This is a New Medical Record - Patient {{ first_name }} {{ last_name }}</h1>
 
-<form id="medicalRecordForm" method="POST">
+<div class=medical-record-form>
+<form id="medicalRecordForm" method="POST" enctype="multipart/form-data">
     <fieldset>
         <legend>Medical Record Details</legend>
         
-        <label for="care_link_id">Care Link ID:</label>
-        <input type="number" id="care_link_id" name="care_link_id" required /><br /><br />
+        <!-- Hidden Field for Care Link ID -->
+        <input type="hidden" id="care_link_id" name="care_link_id" value="{{ care_link_id }}" required /><br /><br />
         
+        <!-- Anamnesis Field -->
         <label for="anamnesis">Anamnesis:</label>
-        <textarea id="anamnesis" name="anamnesis"></textarea><br /><br />
+        <textarea id="anamnesis" name="anamnesis" required></textarea><br /><br />
         
+        <!-- Evolution Field -->
         <label for="evolution">Evolution:</label>
-        <textarea id="evolution" name="evolution"></textarea><br /><br />
-        
-        <label for="appointment_id">Appointment ID:</label>
-        <input type="number" id="appointment_id" name="appointment_id" /><br /><br />
-        
+        <textarea id="evolution" name="evolution" required></textarea><br /><br />
+                
+        <!-- Diagnosis Field -->
         <label for="diagnosis">Diagnosis:</label>
-        <textarea id="diagnosis" name="diagnosis"></textarea><br /><br />
+        <textarea id="diagnosis" name="diagnosis" required></textarea><br /><br />
         
+        <!-- PDF File Upload -->
         <label for="pdf_file">PDF File:</label>
-        <input type="file" id="pdf_file" name="pdf_file" /><br /><br />
+        <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" /><br /><br />
+        
+        <!-- Record Date Field -->
+        <label for="record_date">Record Date:</label>
+        <input type="date" id="record_date" name="record_date" required /><br /><br />
+        
+        <!-- Has Symptoms Checkbox -->
+        <label for="has_symptoms">
+            <input type="checkbox" id="has_symptoms" name="has_symptoms" value="1" />
+            Patient has symptoms
+        </label><br /><br />
+        
+        <!-- Consent Given Checkbox -->
+        <label for="consent_given">
+            <input type="checkbox" id="consent_given" name="consent_given" value="1" />
+            Consent for use of data
+        </label><br /><br />
     </fieldset>
     
+    <!-- Submit and Cancel Buttons -->
     <button type="submit" class="button-style">Submit</button>
     <button type="button" id="cancelFormButton" class="button-style">Back</button>
 </form>
+</div>
+
+
+<h1> Past Consultations </h1>
+<div id="previousRecords"></div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -83,6 +165,7 @@
                 if (response.ok) {
                     const result = await response.json();
                     alert(result.message);
+                    location.reload(); // Refresh the page after successful submission
                 } else {
                     const error = await response.json();
                     alert(error.message);
@@ -92,6 +175,35 @@
                 alert('An error occurred while submitting the medical record. Please try again.');
             }
         });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const careLinkId = document.getElementById('care_link_id').value;
+
+        // Fetch previous medical records
+        fetch(`http://127.0.0.1/api/medical-records?care_link_id=${careLinkId}`)
+            .then(response => response.json())
+            .then(data => {
+                const previousRecordsContainer = document.getElementById('previousRecords');
+                data.records.forEach(record => {
+                    const recordElement = document.createElement('div');
+                    recordElement.classList.add('record');
+                    recordElement.innerHTML = `
+                        <p><strong>Anamnesis:</strong> ${record.anamnesis}</p>
+                        <p><strong>Evolution:</strong> ${record.evolution}</p>
+                        <p><strong>Diagnosis:</strong> ${record.diagnosis}</p>
+                        <p><strong>Appointment ID:</strong> ${record.appointment_id}</p>
+                        <p><strong>Record Date:</strong> ${record.record_date}</p>
+                    `;
+                    previousRecordsContainer.appendChild(recordElement);
+                });
+                console
+            })
+            .catch(error => {
+                console.error('Error fetching previous medical records:', error);
+            });
     });
 </script>
 {% endblock %}

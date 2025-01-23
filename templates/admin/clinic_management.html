@@ -44,8 +44,7 @@
   
       <input type="hidden" id="clinic_type" name="clinic_type" value="Private" />
   
-      <label type="hidden" for="user_id">User ID:</label>
-      <input type="number" id="user_id" name="user_id" required /><br /><br />
+      <input type="hidden" name="user_id" value="{{ user_id }}" required /><br /><br />
     </fieldset>
   
     <button type="submit" class="button-style">Submit</button>
@@ -53,19 +52,7 @@
   </form>
 
   {% block scripts %}
-  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
-  <script>
-      document.addEventListener('DOMContentLoaded', function() {
-          const token = localStorage.getItem('token');
-          console.log(token);
-          if (token) {
-              const decodedToken = jwt_decode(token);
-              const userId = decodedToken.sub.id; // Adjust this based on your token structure
-              document.getElementById('user_id').value = userId;
-              console.log(userId);
-          }
-      });
-  </script>
+
   {% endblock %}
 
 {% endblock %}
